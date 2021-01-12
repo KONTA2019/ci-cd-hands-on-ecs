@@ -6,7 +6,7 @@ phases:
       ## メッセージ
       - echo Logging in to Amazon ECR...
       ## ECRにログイン
-      - $(aws ecr get-login-password | docker login --username AWS --password-stdin https://433411958845.dkr.ecr.ap-northeast-1.amazonaws.com)
+      - aws ecr get-login-password | docker login --username AWS --password-stdin https://433411958845.dkr.ecr.ap-northeast-1.amazonaws.com
       ## 変数準備
       - REPOSITORY_URI=$433411958845.dkr.ecr.ap-northeast-1.amazonaws.com/test_20210113
   build:
