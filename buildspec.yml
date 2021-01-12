@@ -1,14 +1,6 @@
 version: 0.2
 
-# env:
-#   parameter-store:
-#     IMAGE_REPOSITORY_NAME: test_20210113
-
 phases:
-  # install:
-  #   commands:
-  #     ## 依存パッケージをインストール
-  #     - npm install
   pre_build:
     commands:
       ## メッセージ
