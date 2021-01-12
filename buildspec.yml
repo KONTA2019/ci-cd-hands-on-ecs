@@ -1,34 +1,42 @@
 version: 0.2
 
-env:
-  parameter-store:
-    IMAGE_REPOSITORY_NAME: IMAGE_REPOSITORY_NAME
+# env:
+#   parameter-store:
+#     IMAGE_REPOSITORY_NAME: test_20210113
 
 phases:
-  install:
-    commands:
-      ## 依存パッケージをインストール
-      - npm install
+  # install:
+  #   commands:
+  #     ## 依存パッケージをインストール
+  #     - npm install
   pre_build:
     commands:
+      ## メッセージ
+      - echo Logging in to Amazon ECR...
       ## ECRにログイン
-      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-
-      ## Dockerイメージのタグとして使用するため、Gitのコミットハッシュを取得
-      - IMAGE_TAG=$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - $(aws ecr get-login-password | docker login --username AWS --password-stdin https://433411958845.dkr.ecr.ap-northeast-1.amazonaws.com)
+      ## 変数準備
+      - REPOSITORY_URI=$433411958845.dkr.ecr.ap-northeast-1.amazonaws.com/test_20210113
   build:
     commands:
-      ## テスト実行
-      - npm test
+      ## メッセージ
+      - echo Build started on `date`
+      - echo Building the Docker images...
 
       ## Dockerイメージのビルド
-      - docker build -t $IMAGE_REPOSITORY_NAME:$IMAGE_TAG .
-
+      - docker build -t $REPOSITORY_URI:latest .
+  post_build:
+    commands:
+       ## メッセージ
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
       ## DockerイメージのECRへのプッシュ
-      - docker push $IMAGE_REPOSITORY_NAME:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:latest
 
       ## ECSにどのイメージを使用するか指示するためのファイルを作成
-      - printf '[{"name":"fizzbuzz","imageUri":"%s"}]' $IMAGE_REPOSITORY_NAME:$IMAGE_TAG > imagedefinitions.json
+      - echo Writing image definitions file...
+      - printf '[{"name":"fizzbuzz","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+
 #cache:
 #  paths:
 #   - path
